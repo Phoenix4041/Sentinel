@@ -1,5 +1,5 @@
 name: Sentinel
-version: 1.1.1
+version: 1.2.0
 main: Phoenix4041\Sentinel\Loader
 api: ["5.0.0"]
 author: Phoenix4041

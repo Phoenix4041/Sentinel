@@ -14,8 +14,6 @@ final class MessageManager {
     private string $toastTitle;
 
     public function __construct(private readonly Loader $plugin, ConfigManager $configManager) {
-        // getResources() is documented as \SplFileInfo[] (int-keyed) even though the
-        // real keys are the resource's relative path; cast to line up with reality.
         foreach ($plugin->getResources() as $resourceKey => $resource) {
             $resourcePath = (string) $resourceKey;
             if (str_starts_with($resourcePath, "langs/")) {

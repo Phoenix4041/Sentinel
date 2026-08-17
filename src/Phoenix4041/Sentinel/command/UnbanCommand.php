@@ -22,9 +22,6 @@ final class UnbanCommand extends BaseCommand {
         $this->registerArgument(0, new TextArgument("player", true));
     }
 
-    // Permission is still declared above for /help and tab-complete visibility,
-    // but the actual gate stays in onRun() so the sender gets Sentinel's own
-    // toast/message instead of Commando's generic permission text.
     public function testPermission(CommandSender $target, ?string $permission = null): bool {
         return true;
     }

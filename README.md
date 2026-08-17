@@ -129,7 +129,13 @@ src/Phoenix4041/Sentinel/
 
 ### Planned Features (v2.0.0+)
 
-- TBD
+- **Rollback Tool**: `/rollback` (radius + time window) to undo griefing using the block/container audit log SQLite already collects - no new tracking needed, just a query and a replay.
+- **Discord Webhooks**: Optional webhook for bans, mutes and staff-mode toggles, so a moderation log channel doesn't need someone watching the server console.
+- **Player Reports**: `/report <player> <reason>` queued into a staff-only form/menu, so players can flag issues without needing staff online at that exact moment.
+- **MySQL Backend Option**: Swap `DatabaseManager`'s SQLite3 driver for MySQL behind the same interface, for networks that want cross-server ban/mute sync instead of per-server SQLite files.
+- **Staff Activity Stats**: Time spent in staff mode and sanctions issued per staff member, queryable via a form - the data is a natural extension of the existing kill/death/command log tables.
+- **Custom Tool Kits per Rank**: Let `ToolItems::give()` read a configurable set instead of the fixed nine, so different staff ranks can carry different tools.
+- **More Languages**: Community-contributed `resources/langs/*.yml` beyond English and Spanish.
 
 ---
 

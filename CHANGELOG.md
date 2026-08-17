@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.2.0] - 2026-08-17
+
+### Added
+
+- `/mute` and `/unmute` commands, mirroring `/unban`'s pattern - `SanctionForm` now takes a `mute` flag to post to `SanctionManager::mutePlayer()` instead of `banPlayer()`, and `UnmuteForm` lists/clears active mutes only.
+- Real client-side command autocomplete/argument previews for `/staff`, `/unban`, `/mute` and `/unmute`, via the vendored `CortexPE/Commando` (LGPL-3.0) + `muqsit/SimplePacketHandler` (GPL-3.0) virions.
+- Multi-language messages: `resources/langs/en.yml` and `es.yml`, selected via `language` in `config.yml`, loaded through `MessageManager` (same `sendToast`/`broadcastToast`/`getRawMessage` API as before).
+
+### Changed
+
+- Swapped the Vanish and EnderInv tool kit slots (hotbar 5 and 6).
+- `resources/messages.yml` moved to `resources/langs/en.yml`.
+
 ## [1.1.1] - 2026-08-17
 
 ### Fixed

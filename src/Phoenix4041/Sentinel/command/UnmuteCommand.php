@@ -22,7 +22,6 @@ final class UnmuteCommand extends BaseCommand {
         $this->registerArgument(0, new TextArgument("player", true));
     }
 
-    // See UnbanCommand::testPermission() for why this always allows entry.
     public function testPermission(CommandSender $target, ?string $permission = null): bool {
         return true;
     }
