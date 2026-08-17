@@ -1,0 +1,9 @@
+parameters:
+    level: 9
+    paths:
+        - src/Phoenix4041
+    scanDirectories:
+        - vendor/pocketmine/pocketmine-mp/src
+        - vendor/pocketmine/pocketmine-mp/generated
+        - src/muqsit
+    treatPhpDocTypesAsCertain: false

@@ -46,11 +46,11 @@ final class InventoryMenu {
 
         $inventory->setItem(45, $separator);
         $inventory->setItem(46, $separator);
-        $inventory->setItem(47, $armor->getHelmet() ?? VanillaBlocks::AIR()->asItem());
-        $inventory->setItem(48, $armor->getChestplate() ?? VanillaBlocks::AIR()->asItem());
+        $inventory->setItem(47, $armor->getHelmet());
+        $inventory->setItem(48, $armor->getChestplate());
         $inventory->setItem(49, $separator);
-        $inventory->setItem(50, $armor->getLeggings() ?? VanillaBlocks::AIR()->asItem());
-        $inventory->setItem(51, $armor->getBoots() ?? VanillaBlocks::AIR()->asItem());
+        $inventory->setItem(50, $armor->getLeggings());
+        $inventory->setItem(51, $armor->getBoots());
         $inventory->setItem(52, $separator);
         $inventory->setItem(53, $separator);
 

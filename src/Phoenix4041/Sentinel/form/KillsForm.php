@@ -14,6 +14,7 @@ final class KillsForm implements Form {
      */
     public function __construct(private readonly string $targetName, private readonly array $kills) {}
 
+    /** @return array<string, mixed> */
     public function jsonSerialize(): array {
         $content = empty($this->kills) ? "No kills recorded" : "";
 

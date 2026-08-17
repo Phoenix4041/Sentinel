@@ -16,6 +16,7 @@ final class PlayerHistoryForm implements Form {
 
     public function __construct(private readonly Loader $plugin, private readonly string $targetName) {}
 
+    /** @return array<string, mixed> */
     public function jsonSerialize(): array {
         return [
             "type" => "form",
@@ -30,14 +31,14 @@ final class PlayerHistoryForm implements Form {
     }
 
     public function handleResponse(Player $player, $data): void {
-        if ($data === null) {
+        if (!is_int($data)) {
             return;
         }
 
         $db = $this->plugin->getDatabaseManager();
         $limit = $this->plugin->getConfigManager()->getCommandHistoryLimit();
 
-        match ((int)$data) {
+        match ($data) {
             0 => $player->sendForm(new KillsForm($this->targetName, $db->getKills($this->targetName, $limit))),
             1 => $player->sendForm(new DeathsForm($this->targetName, $db->getDeaths($this->targetName, $limit))),
             2 => $player->sendForm(new CommandsForm($this->targetName, $db->getCommandHistory($this->targetName, $limit))),

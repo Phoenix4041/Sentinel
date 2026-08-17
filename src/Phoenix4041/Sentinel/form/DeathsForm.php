@@ -14,6 +14,7 @@ final class DeathsForm implements Form {
      */
     public function __construct(private readonly string $targetName, private readonly array $deaths) {}
 
+    /** @return array<string, mixed> */
     public function jsonSerialize(): array {
         $content = empty($this->deaths) ? "No deaths recorded" : "";
 

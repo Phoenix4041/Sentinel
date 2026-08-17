@@ -6,6 +6,7 @@ namespace Phoenix4041\Sentinel\database;
 
 use Phoenix4041\Sentinel\Loader;
 use SQLite3;
+use SQLite3Stmt;
 
 /**
  * Single source of truth for all Sentinel persistence: command, block,
@@ -14,12 +15,12 @@ use SQLite3;
  */
 final class DatabaseManager {
 
-    private ?SQLite3 $database = null;
+    private SQLite3 $database;
 
-    /** @var array<string, \SQLite3Stmt> */
+    /** @var array<string, SQLite3Stmt> */
     private array $preparedStatements = [];
 
-    /** @var array<string, array{data: array, time: int}> */
+    /** @var array<string, array{data: list<array<string, mixed>>, time: int}> */
     private array $queryCache = [];
 
     private const CACHE_TTL = 300;
@@ -48,6 +49,14 @@ final class DatabaseManager {
 
         $this->createTables();
         $this->prepareStatements();
+    }
+
+    private function preparedOrThrow(string $sql): SQLite3Stmt {
+        $stmt = $this->database->prepare($sql);
+        if ($stmt === false) {
+            throw new \RuntimeException("Failed to prepare statement: " . $this->database->lastErrorMsg());
+        }
+        return $stmt;
     }
 
     private function createTables(): void {
@@ -110,12 +119,12 @@ final class DatabaseManager {
     }
 
     private function prepareStatements(): void {
-        $this->preparedStatements['insert_command'] = $this->database->prepare("
+        $this->preparedStatements['insert_command'] = $this->preparedOrThrow("
             INSERT INTO command_logs (player_name, command, arguments, timestamp)
             VALUES (:player, :command, :args, :time)
         ");
 
-        $this->preparedStatements['select_commands'] = $this->database->prepare("
+        $this->preparedStatements['select_commands'] = $this->preparedOrThrow("
             SELECT command, arguments, timestamp
             FROM command_logs
             WHERE player_name = :player
@@ -123,12 +132,12 @@ final class DatabaseManager {
             LIMIT :limit
         ");
 
-        $this->preparedStatements['insert_block'] = $this->database->prepare("
+        $this->preparedStatements['insert_block'] = $this->preparedOrThrow("
             INSERT INTO block_logs (player_name, action, block_id, x, y, z, world, timestamp)
             VALUES (:player, :action, :block, :x, :y, :z, :world, :time)
         ");
 
-        $this->preparedStatements['select_blocks'] = $this->database->prepare("
+        $this->preparedStatements['select_blocks'] = $this->preparedOrThrow("
             SELECT player_name, action, block_id, timestamp
             FROM block_logs
             WHERE x = :x AND y = :y AND z = :z AND world = :world
@@ -136,12 +145,12 @@ final class DatabaseManager {
             LIMIT :limit
         ");
 
-        $this->preparedStatements['insert_container'] = $this->database->prepare("
+        $this->preparedStatements['insert_container'] = $this->preparedOrThrow("
             INSERT INTO container_logs (player_name, action, container_type, items_changed, x, y, z, world, timestamp)
             VALUES (:player, :action, :type, :items, :x, :y, :z, :world, :time)
         ");
 
-        $this->preparedStatements['select_containers'] = $this->database->prepare("
+        $this->preparedStatements['select_containers'] = $this->preparedOrThrow("
             SELECT player_name, action, container_type, items_changed, timestamp
             FROM container_logs
             WHERE x = :x AND y = :y AND z = :z AND world = :world
@@ -149,21 +158,21 @@ final class DatabaseManager {
             LIMIT :limit
         ");
 
-        $this->preparedStatements['insert_kill'] = $this->database->prepare("
+        $this->preparedStatements['insert_kill'] = $this->preparedOrThrow("
             INSERT INTO kill_logs (killer_name, victim_name, weapon, enchantments, timestamp)
             VALUES (:killer, :victim, :weapon, :enchantments, :time)
         ");
 
-        $this->preparedStatements['select_kills'] = $this->database->prepare("
-            SELECT killer_name, victim_name, weapon, enchantments, timestamp
+        $this->preparedStatements['select_kills'] = $this->preparedOrThrow("
+            SELECT victim_name, weapon, enchantments, timestamp
             FROM kill_logs
             WHERE killer_name = :player
             ORDER BY timestamp DESC
             LIMIT :limit
         ");
 
-        $this->preparedStatements['select_deaths'] = $this->database->prepare("
-            SELECT killer_name, victim_name, weapon, enchantments, timestamp
+        $this->preparedStatements['select_deaths'] = $this->preparedOrThrow("
+            SELECT killer_name, weapon, enchantments, timestamp
             FROM kill_logs
             WHERE victim_name = :player
             ORDER BY timestamp DESC
@@ -185,12 +194,15 @@ final class DatabaseManager {
         $this->invalidateCache("cmd_" . $playerName);
     }
 
+    /** @return list<array{command: string, arguments: string, timestamp: int}> */
     public function getCommandHistory(string $playerName, int $limit = 10): array {
-        return $this->cachedSelect(
+        /** @var list<array{command: string, arguments: string, timestamp: int}> $rows */
+        $rows = $this->cachedSelect(
             "cmd_" . $playerName . "_" . $limit,
             'select_commands',
             [":player" => [$playerName, SQLITE3_TEXT], ":limit" => [$limit, SQLITE3_INTEGER]]
         );
+        return $rows;
     }
 
     public function logBlockAction(
@@ -219,8 +231,10 @@ final class DatabaseManager {
         $this->invalidateCache("block_" . $x . "_" . $y . "_" . $z . "_" . $world);
     }
 
+    /** @return list<array{player_name: string, action: string, block_id: string, timestamp: int}> */
     public function getBlockHistory(int $x, int $y, int $z, string $world, int $limit = 10): array {
-        return $this->cachedSelect(
+        /** @var list<array{player_name: string, action: string, block_id: string, timestamp: int}> $rows */
+        $rows = $this->cachedSelect(
             "block_" . $x . "_" . $y . "_" . $z . "_" . $world . "_" . $limit,
             'select_blocks',
             [
@@ -231,6 +245,7 @@ final class DatabaseManager {
                 ":limit" => [$limit, SQLITE3_INTEGER]
             ]
         );
+        return $rows;
     }
 
     public function logContainerAction(
@@ -261,8 +276,10 @@ final class DatabaseManager {
         $this->invalidateCache("container_" . $x . "_" . $y . "_" . $z . "_" . $world);
     }
 
+    /** @return list<array{player_name: string, action: string, container_type: string, items_changed: string, timestamp: int}> */
     public function getContainerHistory(int $x, int $y, int $z, string $world, int $limit = 10): array {
-        return $this->cachedSelect(
+        /** @var list<array{player_name: string, action: string, container_type: string, items_changed: string, timestamp: int}> $rows */
+        $rows = $this->cachedSelect(
             "container_" . $x . "_" . $y . "_" . $z . "_" . $world . "_" . $limit,
             'select_containers',
             [
@@ -273,6 +290,7 @@ final class DatabaseManager {
                 ":limit" => [$limit, SQLITE3_INTEGER]
             ]
         );
+        return $rows;
     }
 
     /**
@@ -294,24 +312,31 @@ final class DatabaseManager {
         $this->invalidateCache("death_" . $victimName);
     }
 
+    /** @return list<array{victim_name: string, weapon: string, enchantments: string, timestamp: int}> */
     public function getKills(string $playerName, int $limit = 10): array {
-        return $this->cachedSelect(
+        /** @var list<array{victim_name: string, weapon: string, enchantments: string, timestamp: int}> $rows */
+        $rows = $this->cachedSelect(
             "kill_" . $playerName . "_" . $limit,
             'select_kills',
             [":player" => [$playerName, SQLITE3_TEXT], ":limit" => [$limit, SQLITE3_INTEGER]]
         );
+        return $rows;
     }
 
+    /** @return list<array{killer_name: string, weapon: string, enchantments: string, timestamp: int}> */
     public function getDeaths(string $playerName, int $limit = 10): array {
-        return $this->cachedSelect(
+        /** @var list<array{killer_name: string, weapon: string, enchantments: string, timestamp: int}> $rows */
+        $rows = $this->cachedSelect(
             "death_" . $playerName . "_" . $limit,
             'select_deaths',
             [":player" => [$playerName, SQLITE3_TEXT], ":limit" => [$limit, SQLITE3_INTEGER]]
         );
+        return $rows;
     }
 
     /**
      * @param array<string, array{0: mixed, 1: int}> $bindings
+     * @return list<array<string, mixed>>
      */
     private function cachedSelect(string $cacheKey, string $statementKey, array $bindings): array {
         if (isset($this->queryCache[$cacheKey])) {
@@ -335,8 +360,10 @@ final class DatabaseManager {
         $result = $stmt->execute();
         $rows = [];
 
-        while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-            $rows[] = $row;
+        if ($result !== false) {
+            while (($row = $result->fetchArray(SQLITE3_ASSOC)) !== false) {
+                $rows[] = $row;
+            }
         }
 
         $this->addToCache($cacheKey, $rows);
@@ -344,6 +371,7 @@ final class DatabaseManager {
         return $rows;
     }
 
+    /** @param list<array<string, mixed>> $data */
     private function addToCache(string $key, array $data): void {
         if (count($this->queryCache) >= self::MAX_CACHE_SIZE) {
             $oldestKey = array_key_first($this->queryCache);
@@ -364,6 +392,7 @@ final class DatabaseManager {
         }
     }
 
+    /** @return array{hits: int, misses: int, size: int, hit_rate: float|int} */
     public function getCacheStats(): array {
         return [
             'hits' => $this->cacheHits,
@@ -376,14 +405,13 @@ final class DatabaseManager {
     }
 
     public function close(): void {
-        if ($this->database !== null) {
+        if (isset($this->database)) {
             foreach ($this->preparedStatements as $stmt) {
                 $stmt->close();
             }
             $this->preparedStatements = [];
 
             $this->database->close();
-            $this->database = null;
         }
         $this->queryCache = [];
     }

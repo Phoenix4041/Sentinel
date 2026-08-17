@@ -4,52 +4,30 @@ declare(strict_types=1);
 
 namespace Phoenix4041\Sentinel\manager;
 
-use pocketmine\network\mcpe\protocol\SetActorDataPacket;
-use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataFlags;
-use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
-use pocketmine\network\mcpe\protocol\types\entity\LongMetadataProperty;
 use pocketmine\player\Player;
 
 /**
- * Makes staff members glow for other staff/ops via SetActorDataPacket
- * metadata, without touching everyone else's view of them.
+ * Tracks which players are marked as staff-visible. This used to also push
+ * a fake "glowing" SetActorDataPacket flag, but PMMP 5.x's
+ * EntityMetadataFlags table has no glow/outline bit and there is no vanilla
+ * status effect for it either - Bedrock's actual glow effect is driven by
+ * scoreboard team color, which needs its own virion to do safely. Until
+ * that's added, this only tracks who is in glow state; it has no visual
+ * effect on the client.
  */
 final class GlowManager {
 
     /** @var array<string, true> */
     private array $glowing = [];
 
-    private ?ModeManager $modeManager = null;
-
     public function __construct(private readonly PlayerRegistry $playerRegistry) {}
-
-    /**
-     * ModeManager depends on GlowManager, so the reverse link is wired
-     * after both are constructed instead of forming a constructor cycle.
-     */
-    public function setModeManager(ModeManager $modeManager): void {
-        $this->modeManager = $modeManager;
-    }
 
     public function addGlow(Player $player): void {
         $this->glowing[strtolower($player->getName())] = true;
-
-        foreach ($this->playerRegistry->getAll() as $viewer) {
-            if ($viewer->getName() === $player->getName()) {
-                continue;
-            }
-            if ($this->canSeeGlow($viewer)) {
-                $this->sendGlowPacket($player, $viewer, true);
-            }
-        }
     }
 
     public function removeGlow(Player $player): void {
         unset($this->glowing[strtolower($player->getName())]);
-
-        foreach ($this->playerRegistry->getAll() as $viewer) {
-            $this->sendGlowPacket($player, $viewer, false);
-        }
     }
 
     public function removeAllGlow(): void {
@@ -65,35 +43,7 @@ final class GlowManager {
     }
 
     public function sendGlow(Player $player, Player $viewer): void {
-        if ($viewer->getName() === $player->getName()) {
-            return;
-        }
-        if (!$this->hasGlow($player)) {
-            return;
-        }
-        if ($this->canSeeGlow($viewer)) {
-            $this->sendGlowPacket($player, $viewer, true);
-        }
-    }
-
-    private function sendGlowPacket(Player $player, Player $viewer, bool $enable): void {
-        $pk = new SetActorDataPacket();
-        $pk->actorRuntimeId = $player->getId();
-        $pk->metadata = [
-            EntityMetadataProperties::FLAGS => new LongMetadataProperty(
-                $enable
-                    ? (1 << EntityMetadataFlags::HAS_COLLISION) | (1 << EntityMetadataFlags::GLOWING)
-                    : (1 << EntityMetadataFlags::HAS_COLLISION)
-            )
-        ];
-        $viewer->getNetworkSession()->sendDataPacket($pk);
-    }
-
-    private function canSeeGlow(Player $player): bool {
-        return ($this->modeManager?->isStaffMember($player)) ?? $player->hasPermission("pocketmine.command.op");
-    }
-
-    private function hasGlow(Player $player): bool {
-        return isset($this->glowing[strtolower($player->getName())]);
+        // No-op: kept as the call site other managers already use, in case
+        // a scoreboard-team-color glow implementation lands here later.
     }
 }

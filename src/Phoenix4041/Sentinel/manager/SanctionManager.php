@@ -35,17 +35,45 @@ final class SanctionManager {
         $mutes = $this->mutesConfig->get("mutes", []);
         $currentTime = time();
 
-        foreach ($bans as $playerName => $banData) {
-            if ($banData["expires"] === -1 || $banData["expires"] > $currentTime) {
-                $this->activeBans[$playerName] = $banData;
+        if (is_array($bans)) {
+            foreach ($bans as $playerName => $banData) {
+                $ban = self::asBanEntry($banData);
+                if (is_string($playerName) && $ban !== null && ($ban["expires"] === -1 || $ban["expires"] > $currentTime)) {
+                    $this->activeBans[$playerName] = $ban;
+                }
             }
         }
 
-        foreach ($mutes as $playerName => $muteData) {
-            if ($muteData["expires"] === -1 || $muteData["expires"] > $currentTime) {
-                $this->activeMutes[$playerName] = $muteData;
+        if (is_array($mutes)) {
+            foreach ($mutes as $playerName => $muteData) {
+                $mute = self::asMuteEntry($muteData);
+                if (is_string($playerName) && $mute !== null && ($mute["expires"] === -1 || $mute["expires"] > $currentTime)) {
+                    $this->activeMutes[$playerName] = $mute;
+                }
             }
         }
+    }
+
+    /** @return array{reason: string, expires: int, banned_by: string, banned_at: int}|null */
+    private static function asBanEntry(mixed $data): ?array {
+        if (!is_array($data) || !isset($data["reason"], $data["expires"], $data["banned_by"], $data["banned_at"])) {
+            return null;
+        }
+        if (!is_string($data["reason"]) || !is_int($data["expires"]) || !is_string($data["banned_by"]) || !is_int($data["banned_at"])) {
+            return null;
+        }
+        return $data;
+    }
+
+    /** @return array{reason: string, expires: int, muted_by: string, muted_at: int}|null */
+    private static function asMuteEntry(mixed $data): ?array {
+        if (!is_array($data) || !isset($data["reason"], $data["expires"], $data["muted_by"], $data["muted_at"])) {
+            return null;
+        }
+        if (!is_string($data["reason"]) || !is_int($data["expires"]) || !is_string($data["muted_by"]) || !is_int($data["muted_at"])) {
+            return null;
+        }
+        return $data;
     }
 
     public function saveBans(): void {
@@ -173,10 +201,12 @@ final class SanctionManager {
         return false;
     }
 
+    /** @return array{reason: string, expires: int, banned_by: string, banned_at: int}|null */
     public function getBanInfo(string $playerName): ?array {
         return $this->activeBans[$playerName] ?? null;
     }
 
+    /** @return array{reason: string, expires: int, muted_by: string, muted_at: int}|null */
     public function getMuteInfo(string $playerName): ?array {
         return $this->activeMutes[$playerName] ?? null;
     }
@@ -230,10 +260,12 @@ final class SanctionManager {
         return empty($parts) ? "0s" : implode(" ", $parts);
     }
 
+    /** @return array<string, array{reason: string, expires: int, banned_by: string, banned_at: int}> */
     public function getActiveBans(): array {
         return $this->activeBans;
     }
 
+    /** @return array<string, array{reason: string, expires: int, muted_by: string, muted_at: int}> */
     public function getActiveMutes(): array {
         return $this->activeMutes;
     }
@@ -257,7 +289,6 @@ final class SanctionManager {
                     'h' => $value * 3600,
                     'd' => $value * 86400,
                     'm' => $value * 2592000,
-                    default => 0
                 };
             }
         }

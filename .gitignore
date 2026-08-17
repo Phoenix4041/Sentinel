@@ -1,0 +1,20 @@
+# Dependencies
+/vendor/
+composer.phar
+
+# Build output
+/build/
+
+# PHPStan
+.phpstan.cache/
+phpstan-baseline.neon
+
+# OS/editor cruft
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Runtime plugin data (would only appear if this repo doubles as a server data folder)
+/data/

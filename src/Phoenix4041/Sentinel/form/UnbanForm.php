@@ -12,6 +12,7 @@ final class UnbanForm implements Form {
 
     public function __construct(private readonly Loader $plugin) {}
 
+    /** @return array<string, mixed> */
     public function jsonSerialize(): array {
         $bannedPlayers = array_keys($this->plugin->getSanctionManager()->getActiveBans());
 
@@ -46,7 +47,7 @@ final class UnbanForm implements Form {
     }
 
     public function handleResponse(Player $player, $data): void {
-        if ($data === null) {
+        if (!is_array($data) || !isset($data[0], $data[1]) || !is_numeric($data[0]) || !is_numeric($data[1])) {
             return;
         }
 

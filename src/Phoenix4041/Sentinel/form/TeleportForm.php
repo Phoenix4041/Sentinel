@@ -12,6 +12,7 @@ final class TeleportForm implements Form {
 
     public function __construct(private readonly Loader $plugin, private readonly Player $sender) {}
 
+    /** @return array<string, mixed> */
     public function jsonSerialize(): array {
         $onlinePlayers = [];
         foreach ($this->plugin->getServer()->getOnlinePlayers() as $player) {
@@ -41,7 +42,7 @@ final class TeleportForm implements Form {
     }
 
     public function handleResponse(Player $player, $data): void {
-        if ($data === null) {
+        if (!is_array($data) || !isset($data[0]) || !is_numeric($data[0])) {
             return;
         }
 

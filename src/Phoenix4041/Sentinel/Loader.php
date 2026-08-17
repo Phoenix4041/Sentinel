@@ -91,7 +91,6 @@ final class Loader extends PluginBase {
 
         $this->glowManager = new GlowManager($this->playerRegistry);
         $this->modeManager = new ModeManager($this->glowManager, $this->playerRegistry, $this->messageManager, $this->configManager);
-        $this->glowManager->setModeManager($this->modeManager);
 
         $this->databaseManager = new DatabaseManager($this);
         $this->databaseManager->initialize();

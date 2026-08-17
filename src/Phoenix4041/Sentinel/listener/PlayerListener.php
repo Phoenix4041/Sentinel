@@ -12,6 +12,8 @@ use Phoenix4041\Sentinel\Loader;
 use pocketmine\entity\effect\EffectInstance;
 use pocketmine\entity\effect\VanillaEffects;
 use pocketmine\entity\projectile\EnderPearl;
+use pocketmine\item\enchantment\EnchantmentInstance;
+use pocketmine\lang\Translatable;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityItemPickupEvent;
@@ -35,7 +37,10 @@ use pocketmine\player\Player;
  */
 final class PlayerListener implements Listener {
 
-    /** Target-tool click cooldown, keyed by strtolower(moderator name). */
+    /**
+     * Target-tool click cooldown, keyed by strtolower(moderator name).
+     * @var array<string, float>
+     */
     private array $lastToolUse = [];
 
     /** Tool types resolved by attacking the target rather than self-using the item. */
@@ -195,7 +200,10 @@ final class PlayerListener implements Listener {
 
         $weapon = $killer->getInventory()->getItemInHand();
         $enchantNames = array_map(
-            fn($enchantment) => $enchantment->getType()->getName(),
+            function(EnchantmentInstance $enchantment): string {
+                $name = $enchantment->getType()->getName();
+                return $name instanceof Translatable ? $name->getText() : $name;
+            },
             $weapon->getEnchantments()
         );
 

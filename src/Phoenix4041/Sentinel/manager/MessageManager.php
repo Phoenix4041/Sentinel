@@ -15,13 +15,17 @@ final class MessageManager {
 
     public function __construct(private readonly Loader $plugin) {
         $this->messages = new Config($plugin->getDataFolder() . "messages.yml", Config::YAML);
-        $this->toastTitle = $this->messages->get("toast-title", "§8[§6Sentinel§8]");
+
+        $title = $this->messages->get("toast-title", "§8[§6Sentinel§8]");
+        $this->toastTitle = is_string($title) ? $title : "§8[§6Sentinel§8]";
     }
 
+    /** @param array<string, string> $replacements */
     public function sendToast(Player $player, string $key, array $replacements = []): void {
         $player->sendToastNotification($this->toastTitle, $this->getRawMessage($key, $replacements));
     }
 
+    /** @param array<string, string> $replacements */
     public function broadcastToast(string $key, array $replacements = []): void {
         $message = $this->getRawMessage($key, $replacements);
 
@@ -30,8 +34,10 @@ final class MessageManager {
         }
     }
 
+    /** @param array<string, string> $replacements */
     public function getRawMessage(string $key, array $replacements = []): string {
-        $message = $this->messages->get($key, "Message not found: {$key}");
+        $raw = $this->messages->get($key, "Message not found: {$key}");
+        $message = is_string($raw) ? $raw : "Message not found: {$key}";
 
         foreach ($replacements as $search => $replace) {
             $message = str_replace("{" . $search . "}", $replace, $message);

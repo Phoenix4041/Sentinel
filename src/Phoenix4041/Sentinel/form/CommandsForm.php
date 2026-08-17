@@ -14,6 +14,7 @@ final class CommandsForm implements Form {
      */
     public function __construct(private readonly string $targetName, private readonly array $commands) {}
 
+    /** @return array<string, mixed> */
     public function jsonSerialize(): array {
         $content = empty($this->commands) ? "No commands recorded" : "";
 
