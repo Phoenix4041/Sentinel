@@ -1,0 +1,93 @@
+# Inspector Plugin
+
+# Toast title that appears in all notifications
+toast-title: "§8[§6Inspector§8]"
+
+# Inspector Mode Messages
+inspector-mode-on: "§aInspector mode enabled"
+inspector-mode-off: "§cInspector mode disabled"
+inspector-already-enabled: "§cInspector mode is already enabled"
+inspector-already-disabled: "§cInspector mode is already disabled"
+inspector-invalid-subcommand: "§cInvalid subcommand. Use /inspector help"
+
+# Vanish Messages
+vanish-on: "§aYou are now invisible"
+vanish-off: "§cYou are now visible"
+
+# Freeze Messages
+frozen: "§b{player} §fhas been frozen"
+unfrozen: "§b{player} §fhas been unfrozen"
+notification-player-frozen: "§b{player} §fis now frozen"
+notification-player-unfrozen: "§b{player} §fis no longer frozen"
+
+# Staff Chat Messages
+staff-chat-enabled: "§aStaff chat enabled"
+staff-chat-disabled: "§cStaff chat disabled"
+staff-chat-format: "§8[§6STAFF§8] §a{player}§f: §e{message}"
+
+# Teleport Messages
+teleport-form-title: "§6Teleport to Player"
+teleport-player-selection: "§fSelect a player:"
+teleport-no-players: "§cNo players available"
+teleport-success: "§aTeleported to §e{player}"
+teleport-error-no-players: "§cNo players available to teleport"
+teleport-error-invalid: "§cInvalid player selected"
+teleport-error-self: "§cYou cannot teleport to yourself"
+
+# Inventory Messages
+inventory-opened: "§aOpened §e{player}§a's inventory"
+ender-inventory-opened: "§aOpened §e{player}§a's ender chest"
+
+# Permission Messages
+no-permission: "§cYou don't have permission to use this"
+player-only: "This command can only be used by players"
+
+# Command History
+no-command-history: "§cNo command history found for §e{player}"
+
+# Sanction Form Messages
+sanction-form-title: "§6Player Sanction"
+sanction-player-selection: "§fSelect a player:"
+sanction-manual-input: "§7Manual Input"
+sanction-player-name: "§fPlayer name:"
+sanction-player-placeholder: "Enter player name..."
+sanction-reason: "§fReason:"
+sanction-reason-placeholder: "Enter reason..."
+sanction-duration-type: "§fDuration:"
+sanction-duration-custom: "§7Custom"
+sanction-duration-permanent: "§cPermanent"
+sanction-duration-1hour: "§e1 Hour"
+sanction-duration-1day: "§e1 Day"
+sanction-duration-7days: "§e7 Days"
+sanction-duration-30days: "§e30 Days"
+sanction-custom-duration: "§fCustom duration:"
+sanction-custom-placeholder: "e.g., 1h 30min"
+sanction-no-reason: "No reason provided"
+
+# Sanction Messages
+sanction-success: "§a{player} §fhas been banned for §e{duration}§f. Reason: §c{reason}"
+sanction-broadcast: "§c{player} §fwas banned by §a{staff}§f. Reason: §e{reason}"
+sanction-error-no-player: "§cPlease enter a player name"
+sanction-error-invalid-player: "§cInvalid player selected"
+sanction-error-failed: "§cFailed to ban player"
+
+# Unban Form Messages
+unban-form-title: "§6Remove Player Sanction"
+unban-player-selection: "§fSelect a player:"
+unban-type-selection: "§fSanction type:"
+unban-type-ban: "§cBan"
+unban-type-mute: "§eMute"
+unban-type-all: "§6All Sanctions"
+unban-no-players: "§7No banned players"
+
+# Unban Messages
+unban-success: "§a{player} §fhas been §e{type} §fremoved"
+unban-broadcast: "§a{player} §fwas §e{type} §fremoved by §a{staff}"
+unban-error-no-banned: "§cNo banned players found"
+unban-error-invalid: "§cInvalid player selected"
+unban-error-failed: "§cFailed to remove sanction"
+
+# Ban Messages
+ban-permanent: "§cPermanent"
+ban-expired: "§aExpired"
+ban-kick-message: "§c§lYou have been banned!\n\n§fReason: §e{reason}\n§fTime remaining: §c{time}"

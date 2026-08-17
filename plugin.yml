@@ -1,0 +1,14 @@
+name: Sentinel
+version: 1.0.0
+main: Phoenix4041\Sentinel\Loader
+api: ["5.0.0"]
+author: Phoenix4041
+description: Unified staff toolkit merging staff mode (teleport, glow, kill/death/command tracking, quick staff items) with player/chest inspection, command history logging and sanctions/bans.
+
+permissions:
+  epicstaff.use:
+    description: Allows usage of staff mode
+    default: op
+  inspector.command.access:
+    default: op
+    description: Access to inspector mode and tools

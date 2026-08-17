@@ -1,0 +1,150 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Phoenix4041\Sentinel\inspector\form;
+
+use Phoenix4041\Sentinel\Loader;
+use pocketmine\form\Form;
+use pocketmine\player\Player;
+
+class SanctionForm implements Form {
+
+    private Loader $plugin;
+    private ?string $targetPlayer;
+
+    public function __construct(Loader $plugin, ?string $targetPlayer = null) {
+        $this->plugin = $plugin;
+        $this->targetPlayer = $targetPlayer;
+    }
+
+    public function jsonSerialize(): array {
+        $onlinePlayers = [];
+        foreach ($this->plugin->getServer()->getOnlinePlayers() as $player) {
+            $onlinePlayers[] = $player->getName();
+        }
+
+        $msg = $this->plugin->getMessageManager();
+
+        return [
+            "type" => "custom_form",
+            "title" => $msg->getRawMessage("sanction-form-title"),
+            "content" => [
+                [
+                    "type" => "dropdown",
+                    "text" => $msg->getRawMessage("sanction-player-selection"),
+                    "options" => array_merge([$msg->getRawMessage("sanction-manual-input")], $onlinePlayers),
+                    "default" => $this->targetPlayer !== null ?
+                        (array_search($this->targetPlayer, $onlinePlayers) ?: 0) + 1 : 0
+                ],
+                [
+                    "type" => "input",
+                    "text" => $msg->getRawMessage("sanction-player-name"),
+                    "placeholder" => $msg->getRawMessage("sanction-player-placeholder"),
+                    "default" => $this->targetPlayer ?? ""
+                ],
+                [
+                    "type" => "input",
+                    "text" => $msg->getRawMessage("sanction-reason"),
+                    "placeholder" => $msg->getRawMessage("sanction-reason-placeholder"),
+                    "default" => ""
+                ],
+                [
+                    "type" => "dropdown",
+                    "text" => $msg->getRawMessage("sanction-duration-type"),
+                    "options" => [
+                        $msg->getRawMessage("sanction-duration-custom"),
+                        $msg->getRawMessage("sanction-duration-permanent"),
+                        $msg->getRawMessage("sanction-duration-1hour"),
+                        $msg->getRawMessage("sanction-duration-1day"),
+                        $msg->getRawMessage("sanction-duration-7days"),
+                        $msg->getRawMessage("sanction-duration-30days")
+                    ],
+                    "default" => 0
+                ],
+                [
+                    "type" => "input",
+                    "text" => $msg->getRawMessage("sanction-custom-duration"),
+                    "placeholder" => $msg->getRawMessage("sanction-custom-placeholder"),
+                    "default" => ""
+                ]
+            ]
+        ];
+    }
+
+    public function handleResponse(Player $player, $data): void {
+        if ($data === null) {
+            return;
+        }
+
+        $selectedIndex = (int)$data[0];
+        $manualInput = trim((string)$data[1]);
+        $reason = trim((string)$data[2]);
+        $durationType = (int)$data[3];
+        $customDuration = trim((string)$data[4]);
+
+        $targetName = "";
+
+        if ($selectedIndex === 0) {
+            if (empty($manualInput)) {
+                $this->plugin->getMessageManager()->sendToast($player, "sanction-error-no-player");
+                return;
+            }
+            $targetName = $manualInput;
+        } else {
+            $onlinePlayers = array_values(array_map(
+                fn($p) => $p->getName(),
+                $this->plugin->getServer()->getOnlinePlayers()
+            ));
+            $targetName = $onlinePlayers[$selectedIndex - 1] ?? "";
+        }
+
+        if (empty($targetName)) {
+            $this->plugin->getMessageManager()->sendToast($player, "sanction-error-invalid-player");
+            return;
+        }
+
+        if (empty($reason)) {
+            $reason = $this->plugin->getMessageManager()->getRawMessage("sanction-no-reason");
+        }
+
+        $duration = match($durationType) {
+            1 => 0,
+            2 => 3600,
+            3 => 86400,
+            4 => 604800,
+            5 => 2592000,
+            default => $this->plugin->getSanctionManager()->parseDuration($customDuration)
+        };
+
+        $sanctionManager = $this->plugin->getSanctionManager();
+        $success = $sanctionManager->banPlayer($targetName, $reason, $duration, $player->getName());
+
+        if ($success) {
+            $durationText = $duration === 0 ?
+                $this->plugin->getMessageManager()->getRawMessage("ban-permanent") :
+                $customDuration;
+
+            if ($durationType > 1) {
+                $durationText = ["",
+                    $this->plugin->getMessageManager()->getRawMessage("ban-permanent"),
+                    "1h", "1d", "7d", "30d"
+                ][$durationType];
+            }
+
+            $this->plugin->getMessageManager()->sendToast($player, "sanction-success", [
+                "player" => $targetName,
+                "reason" => $reason,
+                "duration" => $durationText
+            ]);
+
+            $this->plugin->getMessageManager()->broadcastToast("sanction-broadcast", [
+                "player" => $targetName,
+                "staff" => $player->getName(),
+                "reason" => $reason
+            ]);
+        } else {
+            $this->plugin->getMessageManager()->sendToast($player, "sanction-error-failed");
+        }
+    }
+}
