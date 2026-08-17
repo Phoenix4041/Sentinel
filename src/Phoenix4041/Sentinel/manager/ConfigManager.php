@@ -30,6 +30,11 @@ final class ConfigManager {
         return $this->getInt("container-history-limit", 10);
     }
 
+    public function getLanguage(): string {
+        $value = $this->plugin->getConfig()->get("language", "en");
+        return is_string($value) ? $value : "en";
+    }
+
     private function getFloat(string $key, float $default): float {
         $value = $this->plugin->getConfig()->get($key, $default);
         return is_numeric($value) ? (float) $value : $default;

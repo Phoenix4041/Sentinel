@@ -4,45 +4,49 @@ declare(strict_types=1);
 
 namespace Phoenix4041\Sentinel\command;
 
+use CortexPE\Commando\BaseCommand;
+use Phoenix4041\Sentinel\command\args\StaffSubCommandArgument;
 use Phoenix4041\Sentinel\Loader;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 
-final class StaffCommand extends Command {
+final class StaffCommand extends BaseCommand {
 
     public function __construct(private readonly Loader $plugin) {
-        parent::__construct(
-            "staff",
-            "Toggle staff mode and manage its tools",
-            "/staff [toggle|on|off|chat|help]",
-            ["staffmode", "mod"]
-        );
+        parent::__construct($plugin, "staff", "Toggle staff mode and manage its tools", ["staffmode", "mod"]);
         $this->setPermission("sentinel.staff");
     }
 
-    public function execute(CommandSender $sender, string $commandLabel, array $args): bool {
+    protected function prepare(): void {
+        $this->registerArgument(0, new StaffSubCommandArgument("subcommand", true));
+    }
+
+    // See UnbanCommand::testPermission() for why this always allows entry.
+    public function testPermission(CommandSender $target, ?string $permission = null): bool {
+        return true;
+    }
+
+    /** @param array<string, mixed> $args */
+    public function onRun(CommandSender $sender, string $aliasUsed, array $args): void {
         if (!$sender instanceof Player) {
             $sender->sendMessage($this->plugin->getMessageManager()->getRawMessage("player-only"));
-            return false;
+            return;
         }
 
         if (!$sender->hasPermission("sentinel.staff")) {
             $this->plugin->getMessageManager()->sendToast($sender, "no-permission");
-            return false;
+            return;
         }
 
         $mode = $this->plugin->getModeManager();
-        $subcommand = strtolower($args[0] ?? "toggle");
+        $subcommand = isset($args["subcommand"]) && is_string($args["subcommand"]) ? $args["subcommand"] : "toggle";
 
         switch ($subcommand) {
             case "toggle":
-            case "t":
                 $mode->toggle($sender);
                 break;
 
             case "on":
-            case "enable":
                 if (!$mode->isActive($sender)) {
                     $mode->enable($sender);
                 } else {
@@ -51,7 +55,6 @@ final class StaffCommand extends Command {
                 break;
 
             case "off":
-            case "disable":
                 if ($mode->isActive($sender)) {
                     $mode->disable($sender);
                 } else {
@@ -60,8 +63,6 @@ final class StaffCommand extends Command {
                 break;
 
             case "chat":
-            case "c":
-            case "sc":
                 if ($mode->isStaffChatEnabled($sender)) {
                     $mode->disableStaffChat($sender);
                 } else {
@@ -70,8 +71,6 @@ final class StaffCommand extends Command {
                 break;
 
             case "help":
-            case "?":
-            case "h":
                 $this->sendHelp($sender);
                 break;
 
@@ -80,8 +79,6 @@ final class StaffCommand extends Command {
                 $this->sendHelp($sender);
                 break;
         }
-
-        return true;
     }
 
     private function sendHelp(Player $player): void {

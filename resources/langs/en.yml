@@ -79,6 +79,26 @@ sanction-error-no-player: "§cPlease enter a player name"
 sanction-error-invalid-player: "§cInvalid player selected"
 sanction-error-failed: "§cFailed to ban player"
 
+# Mute Form (reuses SanctionForm's player/reason/duration fields)
+mute-form-title: "§6Mute Player"
+
+# Mute Results
+mute-success: "§a{player} §fhas been muted for §e{duration}§f. Reason: §c{reason}"
+mute-broadcast: "§c{player} §fwas muted by §a{staff}§f. Reason: §e{reason}"
+mute-error-failed: "§cFailed to mute player"
+
+# Unmute Form
+unmute-form-title: "§6Remove Player Mute"
+unmute-player-selection: "§fSelect a player:"
+unmute-no-players: "§7No muted players"
+
+# Unmute Results
+unmute-success: "§a{player} §fhas been unmuted"
+unmute-broadcast: "§a{player} §fwas unmuted by §a{staff}"
+unmute-error-no-muted: "§cNo muted players found"
+unmute-error-invalid: "§cInvalid player selected"
+unmute-error-failed: "§cFailed to unmute player"
+
 # Unban Form
 unban-form-title: "§6Remove Player Sanction"
 unban-player-selection: "§fSelect a player:"

@@ -10,7 +10,7 @@ use pocketmine\player\Player;
 
 final class UnbanForm implements Form {
 
-    public function __construct(private readonly Loader $plugin) {}
+    public function __construct(private readonly Loader $plugin, private readonly ?string $targetPlayer = null) {}
 
     /** @return array<string, mixed> */
     public function jsonSerialize(): array {
@@ -30,7 +30,8 @@ final class UnbanForm implements Form {
                     "type" => "dropdown",
                     "text" => $msg->getRawMessage("unban-player-selection"),
                     "options" => $bannedPlayers,
-                    "default" => 0
+                    "default" => $this->targetPlayer !== null ?
+                        (array_search($this->targetPlayer, $bannedPlayers, true) ?: 0) : 0
                 ],
                 [
                     "type" => "dropdown",

@@ -10,7 +10,11 @@ use pocketmine\player\Player;
 
 final class SanctionForm implements Form {
 
-    public function __construct(private readonly Loader $plugin, private readonly ?string $targetPlayer = null) {}
+    public function __construct(
+        private readonly Loader $plugin,
+        private readonly ?string $targetPlayer = null,
+        private readonly bool $mute = false
+    ) {}
 
     /** @return array<string, mixed> */
     public function jsonSerialize(): array {
@@ -23,7 +27,7 @@ final class SanctionForm implements Form {
 
         return [
             "type" => "custom_form",
-            "title" => $msg->getRawMessage("sanction-form-title"),
+            "title" => $msg->getRawMessage($this->mute ? "mute-form-title" : "sanction-form-title"),
             "content" => [
                 [
                     "type" => "dropdown",
@@ -119,7 +123,13 @@ final class SanctionForm implements Form {
         };
 
         $sanctionManager = $this->plugin->getSanctionManager();
-        $success = $sanctionManager->banPlayer($targetName, $reason, $duration, $player->getName());
+        $success = $this->mute
+            ? $sanctionManager->mutePlayer($targetName, $reason, $duration, $player->getName())
+            : $sanctionManager->banPlayer($targetName, $reason, $duration, $player->getName());
+
+        $successKey = $this->mute ? "mute-success" : "sanction-success";
+        $broadcastKey = $this->mute ? "mute-broadcast" : "sanction-broadcast";
+        $errorKey = $this->mute ? "mute-error-failed" : "sanction-error-failed";
 
         if ($success) {
             $durationText = $duration === 0 ?
@@ -133,19 +143,19 @@ final class SanctionForm implements Form {
                 ][$durationType];
             }
 
-            $this->plugin->getMessageManager()->sendToast($player, "sanction-success", [
+            $this->plugin->getMessageManager()->sendToast($player, $successKey, [
                 "player" => $targetName,
                 "reason" => $reason,
                 "duration" => $durationText
             ]);
 
-            $this->plugin->getMessageManager()->broadcastToast("sanction-broadcast", [
+            $this->plugin->getMessageManager()->broadcastToast($broadcastKey, [
                 "player" => $targetName,
                 "staff" => $player->getName(),
                 "reason" => $reason
             ]);
         } else {
-            $this->plugin->getMessageManager()->sendToast($player, "sanction-error-failed");
+            $this->plugin->getMessageManager()->sendToast($player, $errorKey);
         }
     }
 }

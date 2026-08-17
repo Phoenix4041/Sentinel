@@ -9,4 +9,7 @@ freeze-cooldown: 0.5
 command-history-limit: 10
 block-history-limit: 10
 container-history-limit: 10
+
+# Language file to use, matching a filename (without extension) under resources/langs/
+language: en
 ...

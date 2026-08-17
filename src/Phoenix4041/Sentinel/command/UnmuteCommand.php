@@ -6,25 +6,23 @@ namespace Phoenix4041\Sentinel\command;
 
 use CortexPE\Commando\args\TextArgument;
 use CortexPE\Commando\BaseCommand;
-use Phoenix4041\Sentinel\form\UnbanForm;
+use Phoenix4041\Sentinel\form\UnmuteForm;
 use Phoenix4041\Sentinel\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 
-final class UnbanCommand extends BaseCommand {
+final class UnmuteCommand extends BaseCommand {
 
     public function __construct(private readonly Loader $plugin) {
-        parent::__construct($plugin, "unban", "Remove sanctions from players", ["pardon", "unsanction"]);
-        $this->setPermission("sentinel.command.unban");
+        parent::__construct($plugin, "unmute", "Unmute players");
+        $this->setPermission("sentinel.command.unmute");
     }
 
     protected function prepare(): void {
         $this->registerArgument(0, new TextArgument("player", true));
     }
 
-    // Permission is still declared above for /help and tab-complete visibility,
-    // but the actual gate stays in onRun() so the sender gets Sentinel's own
-    // toast/message instead of Commando's generic permission text.
+    // See UnbanCommand::testPermission() for why this always allows entry.
     public function testPermission(CommandSender $target, ?string $permission = null): bool {
         return true;
     }
@@ -36,13 +34,13 @@ final class UnbanCommand extends BaseCommand {
             return;
         }
 
-        if (!$sender->hasPermission("sentinel.command.unban")) {
+        if (!$sender->hasPermission("sentinel.command.unmute")) {
             $this->plugin->getMessageManager()->sendToast($sender, "no-permission");
             return;
         }
 
         $targetPlayer = isset($args["player"]) && is_string($args["player"]) ? $args["player"] : null;
 
-        $sender->sendForm(new UnbanForm($this->plugin, $targetPlayer));
+        $sender->sendForm(new UnmuteForm($this->plugin, $targetPlayer));
     }
 }

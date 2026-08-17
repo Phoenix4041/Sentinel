@@ -146,7 +146,7 @@ final class ModeManager {
                 $viewer->showPlayer($player);
             }
 
-            $player->getInventory()->setItem(5, ToolItems::vanishItem(false));
+            $player->getInventory()->setItem(4, ToolItems::vanishItem(false));
             $this->messageManager->sendToast($player, "vanish-off");
         } else {
             $this->vanished[$name] = true;
@@ -157,7 +157,7 @@ final class ModeManager {
                 }
             }
 
-            $player->getInventory()->setItem(5, ToolItems::vanishItem(true));
+            $player->getInventory()->setItem(4, ToolItems::vanishItem(true));
             $this->messageManager->sendToast($player, "vanish-on");
         }
     }

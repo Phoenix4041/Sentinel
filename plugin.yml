@@ -12,3 +12,9 @@ permissions:
   sentinel.command.unban:
     description: Access to /unban
     default: op
+  sentinel.command.mute:
+    description: Access to /mute
+    default: op
+  sentinel.command.unmute:
+    description: Access to /unmute
+    default: op

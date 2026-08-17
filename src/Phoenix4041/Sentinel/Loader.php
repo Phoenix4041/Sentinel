@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Phoenix4041\Sentinel;
 
+use CortexPE\Commando\PacketHooker;
 use muqsit\invmenu\InvMenuHandler;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\EventPriority;
 use pocketmine\plugin\PluginBase;
 
+use Phoenix4041\Sentinel\command\MuteCommand;
 use Phoenix4041\Sentinel\command\StaffCommand;
 use Phoenix4041\Sentinel\command\UnbanCommand;
+use Phoenix4041\Sentinel\command\UnmuteCommand;
 use Phoenix4041\Sentinel\database\DatabaseManager;
 use Phoenix4041\Sentinel\listener\BlockListener;
 use Phoenix4041\Sentinel\listener\CommandListener;
@@ -55,10 +58,13 @@ final class Loader extends PluginBase {
 
     protected function onEnable(): void {
         $this->saveDefaultConfig();
-        $this->saveResource("messages.yml");
 
         if (!InvMenuHandler::isRegistered()) {
             InvMenuHandler::register($this);
+        }
+
+        if (!PacketHooker::isRegistered()) {
+            PacketHooker::register($this);
         }
 
         $this->initializeManagers();
@@ -87,7 +93,7 @@ final class Loader extends PluginBase {
     private function initializeManagers(): void {
         $this->playerRegistry = new PlayerRegistry();
         $this->configManager = new ConfigManager($this);
-        $this->messageManager = new MessageManager($this);
+        $this->messageManager = new MessageManager($this, $this->configManager);
 
         $this->glowManager = new GlowManager($this->playerRegistry);
         $this->modeManager = new ModeManager($this->glowManager, $this->playerRegistry, $this->messageManager, $this->configManager);
@@ -104,6 +110,8 @@ final class Loader extends PluginBase {
 
         $commandMap->register("sentinel", new StaffCommand($this));
         $commandMap->register("sentinel", new UnbanCommand($this));
+        $commandMap->register("sentinel", new MuteCommand($this));
+        $commandMap->register("sentinel", new UnmuteCommand($this));
     }
 
     private function registerListeners(): void {

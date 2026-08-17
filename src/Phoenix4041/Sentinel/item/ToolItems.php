@@ -28,8 +28,8 @@ final class ToolItems {
         $inventory->setItem(1, self::tag(VanillaItems::COMPASS(), "teleport", "§8[§dTeleport§8]"));
         $inventory->setItem(2, self::tag(VanillaItems::PAPER(), "history", "§8[§eHistory§8]"));
         $inventory->setItem(3, self::tag(VanillaBlocks::CHEST()->asItem(), "invsee", "§8[§6InvSee§8]"));
-        $inventory->setItem(4, self::tag(VanillaBlocks::ENDER_CHEST()->asItem(), "enderinv", "§8[§dEnderInv§8]"));
-        $inventory->setItem(5, self::vanishItem(false));
+        $inventory->setItem(4, self::vanishItem(false));
+        $inventory->setItem(5, self::tag(VanillaBlocks::ENDER_CHEST()->asItem(), "enderinv", "§8[§dEnderInv§8]"));
         $inventory->setItem(6, self::tag(VanillaItems::BLAZE_ROD(), "freeze", "§8[§bFreeze§8]"));
         $inventory->setItem(7, self::nightVisionItem());
         $inventory->setItem(8, self::tag(VanillaItems::STICK(), "ban", "§8[§cBan§8]"));

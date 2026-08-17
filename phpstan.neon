@@ -6,4 +6,5 @@ parameters:
         - vendor/pocketmine/pocketmine-mp/src
         - vendor/pocketmine/pocketmine-mp/generated
         - src/muqsit
+        - src/CortexPE
     treatPhpDocTypesAsCertain: false

@@ -1,0 +1,121 @@
+# Mensajes de Sentinel
+
+# Titulo del toast en cada notificacion
+toast-title: "§8[§6Sentinel§8]"
+
+# Modo Staff
+mode-on: "§aModo staff activado"
+mode-off: "§cModo staff desactivado"
+mode-already-enabled: "§cEl modo staff ya esta activado"
+mode-already-disabled: "§cEl modo staff ya esta desactivado"
+mode-invalid-subcommand: "§cSubcomando invalido. Usa /staff help"
+
+# Herramienta RandomTp
+randomtp-no-players: "§cNo hay jugadores conectados"
+randomtp-success: "§aTeletransportado a §e{player}"
+
+# Herramienta Night Vision
+nightvision-on: "§aVision nocturna activada"
+nightvision-off: "§cVision nocturna desactivada"
+
+# Herramienta Vanish
+vanish-on: "§aAhora eres invisible"
+vanish-off: "§cAhora eres visible"
+
+# Herramienta Freeze
+frozen-on: "§b{player} §fha sido congelado"
+frozen-off: "§b{player} §fha sido descongelado"
+notification-player-frozen: "§b{player} §festa congelado"
+notification-player-unfrozen: "§b{player} §fya no esta congelado"
+
+# Chat de Staff
+staff-chat-enabled: "§aChat de staff activado"
+staff-chat-disabled: "§cChat de staff desactivado"
+staff-chat-format: "§8[§6STAFF§8] §a{player}§f: §e{message}"
+
+# Herramienta Teleport
+teleport-form-title: "§6Teletransportar a jugador"
+teleport-player-selection: "§fSelecciona un jugador:"
+teleport-no-players: "§cNo hay jugadores disponibles"
+teleport-success: "§aTeletransportado a §e{player}"
+teleport-error-no-players: "§cNo hay jugadores disponibles para teletransportar"
+teleport-error-invalid: "§cJugador seleccionado invalido"
+teleport-error-self: "§cNo puedes teletransportarte a ti mismo"
+
+# Herramientas InvSee / EnderInv
+inventory-opened: "§aInventario de §e{player}§a abierto"
+ender-inventory-opened: "§aBaul del end de §e{player}§a abierto"
+
+# Mensajes de permisos
+no-permission: "§cNo tienes permiso para usar esto"
+player-only: "Este comando solo puede ser usado por jugadores"
+
+# Herramienta History
+no-command-history: "§cNo se encontro historial de comandos para §e{player}"
+
+# Formulario de sancion
+sanction-form-title: "§6Sancionar jugador"
+sanction-player-selection: "§fSelecciona un jugador:"
+sanction-manual-input: "§7Entrada manual"
+sanction-player-name: "§fNombre del jugador:"
+sanction-player-placeholder: "Ingresa el nombre del jugador..."
+sanction-reason: "§fRazon:"
+sanction-reason-placeholder: "Ingresa la razon..."
+sanction-duration-type: "§fDuracion:"
+sanction-duration-custom: "§7Personalizada"
+sanction-duration-permanent: "§cPermanente"
+sanction-duration-1hour: "§e1 Hora"
+sanction-duration-1day: "§e1 Dia"
+sanction-duration-7days: "§e7 Dias"
+sanction-duration-30days: "§e30 Dias"
+sanction-custom-duration: "§fDuracion personalizada:"
+sanction-custom-placeholder: "ej. 1h 30min"
+sanction-no-reason: "No se indico una razon"
+
+# Resultados de sancion
+sanction-success: "§a{player} §fha sido baneado por §e{duration}§f. Razon: §c{reason}"
+sanction-broadcast: "§c{player} §ffue baneado por §a{staff}§f. Razon: §e{reason}"
+sanction-error-no-player: "§cIngresa el nombre de un jugador"
+sanction-error-invalid-player: "§cJugador seleccionado invalido"
+sanction-error-failed: "§cNo se pudo banear al jugador"
+
+# Formulario de mute (reutiliza los campos de jugador/razon/duracion de SanctionForm)
+mute-form-title: "§6Silenciar jugador"
+
+# Resultados de mute
+mute-success: "§a{player} §fha sido silenciado por §e{duration}§f. Razon: §c{reason}"
+mute-broadcast: "§c{player} §ffue silenciado por §a{staff}§f. Razon: §e{reason}"
+mute-error-failed: "§cNo se pudo silenciar al jugador"
+
+# Formulario de unmute
+unmute-form-title: "§6Quitar silencio a jugador"
+unmute-player-selection: "§fSelecciona un jugador:"
+unmute-no-players: "§7No hay jugadores silenciados"
+
+# Resultados de unmute
+unmute-success: "§a{player} §fya no esta silenciado"
+unmute-broadcast: "§a{player} §fya no esta silenciado, removido por §a{staff}"
+unmute-error-no-muted: "§cNo se encontraron jugadores silenciados"
+unmute-error-invalid: "§cJugador seleccionado invalido"
+unmute-error-failed: "§cNo se pudo quitar el silencio al jugador"
+
+# Formulario de unban
+unban-form-title: "§6Quitar sancion a jugador"
+unban-player-selection: "§fSelecciona un jugador:"
+unban-type-selection: "§fTipo de sancion:"
+unban-type-ban: "§cBaneo"
+unban-type-mute: "§eSilencio"
+unban-type-all: "§6Todas las sanciones"
+unban-no-players: "§7No hay jugadores baneados"
+
+# Resultados de unban
+unban-success: "§a{player} §fya no tiene §e{type}"
+unban-broadcast: "§a{player} §fya no tiene §e{type}§f, removido por §a{staff}"
+unban-error-no-banned: "§cNo se encontraron jugadores baneados"
+unban-error-invalid: "§cJugador seleccionado invalido"
+unban-error-failed: "§cNo se pudo remover la sancion"
+
+# Expulsion por baneo
+ban-permanent: "§cPermanente"
+ban-expired: "§aExpirado"
+ban-kick-message: "§c§l¡Has sido baneado!\n\n§fRazon: §e{reason}\n§fTiempo restante: §c{time}"
