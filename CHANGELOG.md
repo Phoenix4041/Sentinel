@@ -4,6 +4,34 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.1.0] - 2026-08-17
+
+### Changed
+
+- Real architectural merge: the plugin was previously two parallel systems glued under one namespace; it is now one system designed as a single plugin.
+- Replaced the dual staff-mode/inspector-mode duality with a single `manager\ModeManager`: one save/restore snapshot (position, inventory, armor, gamemode, flight), one vanish state, one freeze state, one staff-chat state, all cleaned up on `PlayerQuitEvent`.
+- Replaced the two overlapping tool sets (7 CustomName-matched items and 8 NBT-tagged items) with one 9-item kit in `item\ToolItems`, always resolved by NBT tag: RandomTp, Teleport, History, InvSee, EnderInv, Vanish, Freeze, Night Vision, Ban. Filled hotbar slots 0-8 with no gaps and no duplicate function.
+- Replaced YAML-backed `DataManager` with SQLite: kill/death tracking now lives in a new `kill_logs` table on `database\DatabaseManager`, indexed by killer and victim, following the same prepared-statement + query-cache pattern as the existing command/block/container tables.
+- Merged the two `CommandEvent` listeners into one `listener\CommandListener`: logs to SQLite and cancels commands from frozen players.
+- Merged block-place/death tracking into `listener\BlockListener`/`listener\PlayerListener`, backed entirely by SQLite (block/container logging already used it; kill/death logging was moved onto it).
+- Replaced `epicstaff.use` and `inspector.command.access` with `sentinel.staff` (staff mode + tool kit) and `sentinel.command.unban` (`/unban`).
+- Replaced `/staff` (toggle-only) and `/inspector` (toggle/on/off/chat/help) with a single `/staff` command (aliases `staffmode`, `mod`) carrying every subcommand.
+- Reorganized `src/Phoenix4041/Sentinel/` by responsibility instead of origin: `command/`, `listener/`, `manager/`, `database/`, `item/`, `form/`, `menu/` replace the old `staff/` and `inspector/` top-level split.
+- Renamed the SQLite database file from `inspector.db` to `sentinel.db` and the toast title from `[Inspector]` to `[Sentinel]`.
+- `GlowManager` no longer reaches into `Loader::getInstance()` to check staff status; `ModeManager` is now wired in via setter injection after construction, avoiding the constructor cycle while keeping it out of the forbidden global-lookup pattern.
+- Inventory/ender-chest viewing now always goes through `menu\InventoryMenu` (InvMenu-based, shows armor slots), which was the more complete of the two prior implementations; the raw window-swap version was unused dead code and is gone.
+- Vanish, freeze and history cooldowns/limits are now actually read from `config.yml` via `ConfigManager` instead of being hardcoded past a dead config wiring.
+
+### Removed
+
+- `staff/manager/StaffManager.php` and `inspector/manager/InspectorManager.php`, merged into `manager/ModeManager.php`.
+- `staff/manager/DataManager.php` (YAML kill/death/command/block/container storage) - functionality now lives in `database/DatabaseManager.php`.
+- `inspector/menu/InventoryMenu.php` (the unused raw window-swap implementation).
+- `/inspector` command and its class `inspector/command/InspectorCommand.php` - folded into `/staff`.
+- Legacy permissions `epicstaff.use` and `inspector.command.access`.
+- Duplicate `CommandListener` (one of the two former copies).
+- All folder-level `staff/` and `inspector/` separation.
+
 ## [1.0.0] - 2026-08-17
 
 ### Added

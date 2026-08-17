@@ -9,53 +9,38 @@ use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\EventPriority;
 use pocketmine\plugin\PluginBase;
 
+use Phoenix4041\Sentinel\command\StaffCommand;
+use Phoenix4041\Sentinel\command\UnbanCommand;
+use Phoenix4041\Sentinel\database\DatabaseManager;
+use Phoenix4041\Sentinel\listener\BlockListener;
+use Phoenix4041\Sentinel\listener\CommandListener;
+use Phoenix4041\Sentinel\listener\ContainerListener;
+use Phoenix4041\Sentinel\listener\PlayerListener;
+use Phoenix4041\Sentinel\listener\PlayerRegistryListener;
+use Phoenix4041\Sentinel\manager\ConfigManager;
+use Phoenix4041\Sentinel\manager\GlowManager;
+use Phoenix4041\Sentinel\manager\MessageManager;
+use Phoenix4041\Sentinel\manager\ModeManager;
 use Phoenix4041\Sentinel\manager\PlayerRegistry;
-use Phoenix4041\Sentinel\manager\PlayerRegistryListener;
-
-use Phoenix4041\Sentinel\staff\manager\StaffManager;
-use Phoenix4041\Sentinel\staff\manager\DataManager;
-use Phoenix4041\Sentinel\staff\manager\GlowManager;
-use Phoenix4041\Sentinel\staff\command\StaffCommand;
-use Phoenix4041\Sentinel\staff\listener\StaffListener;
-use Phoenix4041\Sentinel\staff\listener\DataListener;
-use Phoenix4041\Sentinel\staff\listener\CommandListener as StaffCommandListener;
-
-use Phoenix4041\Sentinel\inspector\command\InspectorCommand;
-use Phoenix4041\Sentinel\inspector\command\UnbanCommand;
-use Phoenix4041\Sentinel\inspector\database\DatabaseManager;
-use Phoenix4041\Sentinel\inspector\listener\BlockListener;
-use Phoenix4041\Sentinel\inspector\listener\CommandListener as InspectorCommandListener;
-use Phoenix4041\Sentinel\inspector\listener\ContainerListener;
-use Phoenix4041\Sentinel\inspector\listener\PlayerListener;
-use Phoenix4041\Sentinel\inspector\manager\ConfigManager;
-use Phoenix4041\Sentinel\inspector\manager\InspectorManager;
-use Phoenix4041\Sentinel\inspector\manager\MessageManager;
-use Phoenix4041\Sentinel\inspector\manager\SanctionManager;
+use Phoenix4041\Sentinel\manager\SanctionManager;
+use Phoenix4041\Sentinel\menu\InventoryMenu;
 
 /**
- * Single bootstrap for the merged Sentinel plugin (EpicStaff + Inspector).
- *
- * Mirrors what each original Loader.php did in isolation - loading
- * resources, saving default config, registering listeners/commands and
- * initializing managers - but unified into one plugin lifecycle.
+ * Single bootstrap for Sentinel: loads resources, saves default config,
+ * wires up every manager/listener/command and owns the plugin lifecycle.
  */
 final class Loader extends PluginBase {
 
     private static ?self $instance = null;
 
     private PlayerRegistry $playerRegistry;
-
-    // staff module
-    private StaffManager $staffManager;
-    private DataManager $dataManager;
-    private GlowManager $glowManager;
-
-    // inspector module
-    private DatabaseManager $databaseManager;
-    private InspectorManager $inspectorManager;
-    private MessageManager $messageManager;
     private ConfigManager $configManager;
+    private MessageManager $messageManager;
+    private GlowManager $glowManager;
+    private ModeManager $modeManager;
+    private DatabaseManager $databaseManager;
     private SanctionManager $sanctionManager;
+    private InventoryMenu $inventoryMenu;
 
     public static function getInstance(): self {
         if (self::$instance === null) {
@@ -82,27 +67,18 @@ final class Loader extends PluginBase {
     }
 
     protected function onDisable(): void {
-        // Staff module cleanup
-        if (isset($this->staffManager)) {
-            $this->staffManager->disableAll();
+        if (isset($this->modeManager)) {
+            $this->modeManager->disableAll();
         }
         if (isset($this->glowManager)) {
             $this->glowManager->removeAllGlow();
         }
-        if (isset($this->dataManager)) {
-            $this->dataManager->save();
-        }
-
-        // Inspector module cleanup
-        if (isset($this->inspectorManager)) {
-            $this->inspectorManager->disableAllInspectorModes();
-        }
-        if (isset($this->databaseManager)) {
-            $this->databaseManager->close();
-        }
         if (isset($this->sanctionManager)) {
             $this->sanctionManager->saveBans();
             $this->sanctionManager->saveMutes();
+        }
+        if (isset($this->databaseManager)) {
+            $this->databaseManager->close();
         }
 
         self::$instance = null;
@@ -110,51 +86,37 @@ final class Loader extends PluginBase {
 
     private function initializeManagers(): void {
         $this->playerRegistry = new PlayerRegistry();
-
-        // Staff module
-        $this->dataManager = new DataManager($this);
-        $this->glowManager = new GlowManager($this->playerRegistry);
-        $this->staffManager = new StaffManager($this->glowManager, $this->playerRegistry);
-
-        // Inspector module
         $this->configManager = new ConfigManager($this);
         $this->messageManager = new MessageManager($this);
-        $this->databaseManager = new DatabaseManager($this);
-        $this->inspectorManager = new InspectorManager($this);
-        $this->sanctionManager = new SanctionManager($this, $this->playerRegistry);
 
+        $this->glowManager = new GlowManager($this->playerRegistry);
+        $this->modeManager = new ModeManager($this->glowManager, $this->playerRegistry, $this->messageManager, $this->configManager);
+        $this->glowManager->setModeManager($this->modeManager);
+
+        $this->databaseManager = new DatabaseManager($this);
         $this->databaseManager->initialize();
+
+        $this->sanctionManager = new SanctionManager($this, $this->playerRegistry);
+        $this->inventoryMenu = new InventoryMenu($this);
     }
 
     private function registerCommands(): void {
         $commandMap = $this->getServer()->getCommandMap();
 
-        // Staff module
-        $commandMap->register("epicstaff", new StaffCommand($this->staffManager));
-
-        // Inspector module
-        $commandMap->register("inspector", new InspectorCommand($this));
-        $commandMap->register("unban", new UnbanCommand($this));
+        $commandMap->register("sentinel", new StaffCommand($this));
+        $commandMap->register("sentinel", new UnbanCommand($this));
     }
 
     private function registerListeners(): void {
         $pm = $this->getServer()->getPluginManager();
 
-        // Shared
         $pm->registerEvents(new PlayerRegistryListener($this->playerRegistry), $this);
-
-        // Staff module
-        $pm->registerEvents(new StaffListener($this->staffManager), $this);
-        $pm->registerEvents(new DataListener($this->dataManager), $this);
-        $pm->registerEvents(new StaffCommandListener($this->staffManager, $this->dataManager), $this);
-
-        // Inspector module
-        $playerListener = new PlayerListener($this);
-
-        $pm->registerEvents($playerListener, $this);
         $pm->registerEvents(new BlockListener($this), $this);
         $pm->registerEvents(new ContainerListener($this), $this);
-        $pm->registerEvents(new InspectorCommandListener($this), $this);
+        $pm->registerEvents(new CommandListener($this), $this);
+
+        $playerListener = new PlayerListener($this);
+        $pm->registerEvents($playerListener, $this);
 
         $pm->registerEvent(
             EntityDamageEvent::class,
@@ -181,39 +143,31 @@ final class Loader extends PluginBase {
         return $this->playerRegistry;
     }
 
-    // Staff module accessors
-
-    public function getStaffManager(): StaffManager {
-        return $this->staffManager;
-    }
-
-    public function getDataManager(): DataManager {
-        return $this->dataManager;
-    }
-
-    public function getGlowManager(): GlowManager {
-        return $this->glowManager;
-    }
-
-    // Inspector module accessors
-
-    public function getDatabaseManager(): DatabaseManager {
-        return $this->databaseManager;
-    }
-
-    public function getInspectorManager(): InspectorManager {
-        return $this->inspectorManager;
+    public function getConfigManager(): ConfigManager {
+        return $this->configManager;
     }
 
     public function getMessageManager(): MessageManager {
         return $this->messageManager;
     }
 
-    public function getConfigManager(): ConfigManager {
-        return $this->configManager;
+    public function getGlowManager(): GlowManager {
+        return $this->glowManager;
+    }
+
+    public function getModeManager(): ModeManager {
+        return $this->modeManager;
+    }
+
+    public function getDatabaseManager(): DatabaseManager {
+        return $this->databaseManager;
     }
 
     public function getSanctionManager(): SanctionManager {
         return $this->sanctionManager;
+    }
+
+    public function getInventoryMenu(): InventoryMenu {
+        return $this->inventoryMenu;
     }
 }

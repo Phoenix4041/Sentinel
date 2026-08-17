@@ -1,14 +1,14 @@
 name: Sentinel
-version: 1.0.0
+version: 1.1.0
 main: Phoenix4041\Sentinel\Loader
 api: ["5.0.0"]
 author: Phoenix4041
-description: Unified staff toolkit merging staff mode (teleport, glow, kill/death/command tracking, quick staff items) with player/chest inspection, command history logging and sanctions/bans.
+description: Unified staff toolkit for PocketMine-MP 5.x - one staff mode with a deduplicated NBT-tagged tool kit (teleport, freeze, vanish, invsee, ender inventory, history, ban, night vision), SQLite-backed command/block/container/kill audit logging, and sanctions/bans.
 
 permissions:
-  epicstaff.use:
-    description: Allows usage of staff mode
+  sentinel.staff:
+    description: Access to /staff, staff mode and its tool kit
     default: op
-  inspector.command.access:
+  sentinel.command.unban:
+    description: Access to /unban
     default: op
-    description: Access to inspector mode and tools

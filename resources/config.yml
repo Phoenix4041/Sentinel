@@ -1,60 +1,12 @@
 ---
-# Inspector Configuration
+# Sentinel Configuration
 
-# Database settings
-database:
-  # Cache duration for queries (seconds)
-  cache-ttl: 300
-  
-  # SQLite3 cache size in pages (10000 = ~10MB)
-  cache-size: 10000
-  
-  # Busy timeout in milliseconds
-  busy-timeout: 5000
-  
-  # Enable WAL mode for better concurrency
-  enable-wal: true
-  
-  # Max query results to prevent memory bloat
-  max-results: 100
+# Staff mode tool cooldowns (seconds)
+vanish-cooldown: 1.0
+freeze-cooldown: 0.5
 
-# History settings
-history:
-  # Maximum entries to display per query
-  max-entries: 10
-  
-  # Default retention days (0 = unlimited, set manually)
-  retention-days: 0
-
-# Performance settings
-performance:
-  # Enable query result caching
-  enable-cache: true
-  
-  # Cleanup cooldowns interval (seconds)
-  cooldown-cleanup-interval: 3600
-  
-  # Cooldown durations (seconds)
-  cooldowns:
-    vanish: 2.0
-    freeze: 0.5
-    move: 0
-
-# Logging
-logging:
-  # Log block placements
-  log-blocks: true
-  
-  # Log container interactions
-  log-containers: true
-  
-  # Log player commands
-  log-commands: true
-
-# Messages
-messages:
-  prefix: "§6Inspector §f| "
-  inspector-mode-on: "§aInspector mode enabled"
-  inspector-mode-off: "§cInspector mode disabled"
-
+# History query limits (rows returned per lookup)
+command-history-limit: 10
+block-history-limit: 10
+container-history-limit: 10
 ...

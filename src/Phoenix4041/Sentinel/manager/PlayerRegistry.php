@@ -7,12 +7,10 @@ namespace Phoenix4041\Sentinel\manager;
 use pocketmine\player\Player;
 
 /**
- * Keeps a name-indexed lookup of currently online players, updated on join/quit.
- *
- * Introduced during the EpicStaff/Inspector merge to replace direct
- * Server::getPlayerExact() / getPlayerByName() calls and manual iteration
- * over getOnlinePlayers() to find a player by name, which PMMP 5.x flags
- * as an anti-pattern for high player-count servers.
+ * Name-indexed lookup of currently online players, updated on join/quit.
+ * Exists so player-by-name resolution never has to fall back to
+ * Server::getPlayerExact()/getPlayerByName() or an O(n) scan over
+ * getOnlinePlayers(), both of which are anti-patterns at high player counts.
  */
 final class PlayerRegistry {
 

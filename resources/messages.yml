@@ -1,31 +1,39 @@
-# Inspector Plugin
+# Sentinel Messages
 
-# Toast title that appears in all notifications
-toast-title: "§8[§6Inspector§8]"
+# Toast title shown on every notification
+toast-title: "§8[§6Sentinel§8]"
 
-# Inspector Mode Messages
-inspector-mode-on: "§aInspector mode enabled"
-inspector-mode-off: "§cInspector mode disabled"
-inspector-already-enabled: "§cInspector mode is already enabled"
-inspector-already-disabled: "§cInspector mode is already disabled"
-inspector-invalid-subcommand: "§cInvalid subcommand. Use /inspector help"
+# Staff Mode
+mode-on: "§aStaff mode enabled"
+mode-off: "§cStaff mode disabled"
+mode-already-enabled: "§cStaff mode is already enabled"
+mode-already-disabled: "§cStaff mode is already disabled"
+mode-invalid-subcommand: "§cInvalid subcommand. Use /staff help"
 
-# Vanish Messages
+# RandomTp Tool
+randomtp-no-players: "§cNo players online"
+randomtp-success: "§aTeleported to §e{player}"
+
+# Night Vision Tool
+nightvision-on: "§aNight Vision enabled"
+nightvision-off: "§cNight Vision disabled"
+
+# Vanish Tool
 vanish-on: "§aYou are now invisible"
 vanish-off: "§cYou are now visible"
 
-# Freeze Messages
-frozen: "§b{player} §fhas been frozen"
-unfrozen: "§b{player} §fhas been unfrozen"
+# Freeze Tool
+frozen-on: "§b{player} §fhas been frozen"
+frozen-off: "§b{player} §fhas been unfrozen"
 notification-player-frozen: "§b{player} §fis now frozen"
 notification-player-unfrozen: "§b{player} §fis no longer frozen"
 
-# Staff Chat Messages
+# Staff Chat
 staff-chat-enabled: "§aStaff chat enabled"
 staff-chat-disabled: "§cStaff chat disabled"
 staff-chat-format: "§8[§6STAFF§8] §a{player}§f: §e{message}"
 
-# Teleport Messages
+# Teleport Tool
 teleport-form-title: "§6Teleport to Player"
 teleport-player-selection: "§fSelect a player:"
 teleport-no-players: "§cNo players available"
@@ -34,7 +42,7 @@ teleport-error-no-players: "§cNo players available to teleport"
 teleport-error-invalid: "§cInvalid player selected"
 teleport-error-self: "§cYou cannot teleport to yourself"
 
-# Inventory Messages
+# InvSee / EnderInv Tools
 inventory-opened: "§aOpened §e{player}§a's inventory"
 ender-inventory-opened: "§aOpened §e{player}§a's ender chest"
 
@@ -42,10 +50,10 @@ ender-inventory-opened: "§aOpened §e{player}§a's ender chest"
 no-permission: "§cYou don't have permission to use this"
 player-only: "This command can only be used by players"
 
-# Command History
+# History Tool
 no-command-history: "§cNo command history found for §e{player}"
 
-# Sanction Form Messages
+# Sanction Form
 sanction-form-title: "§6Player Sanction"
 sanction-player-selection: "§fSelect a player:"
 sanction-manual-input: "§7Manual Input"
@@ -64,14 +72,14 @@ sanction-custom-duration: "§fCustom duration:"
 sanction-custom-placeholder: "e.g., 1h 30min"
 sanction-no-reason: "No reason provided"
 
-# Sanction Messages
+# Sanction Results
 sanction-success: "§a{player} §fhas been banned for §e{duration}§f. Reason: §c{reason}"
 sanction-broadcast: "§c{player} §fwas banned by §a{staff}§f. Reason: §e{reason}"
 sanction-error-no-player: "§cPlease enter a player name"
 sanction-error-invalid-player: "§cInvalid player selected"
 sanction-error-failed: "§cFailed to ban player"
 
-# Unban Form Messages
+# Unban Form
 unban-form-title: "§6Remove Player Sanction"
 unban-player-selection: "§fSelect a player:"
 unban-type-selection: "§fSanction type:"
@@ -80,14 +88,14 @@ unban-type-mute: "§eMute"
 unban-type-all: "§6All Sanctions"
 unban-no-players: "§7No banned players"
 
-# Unban Messages
+# Unban Results
 unban-success: "§a{player} §fhas been §e{type} §fremoved"
 unban-broadcast: "§a{player} §fwas §e{type} §fremoved by §a{staff}"
 unban-error-no-banned: "§cNo banned players found"
 unban-error-invalid: "§cInvalid player selected"
 unban-error-failed: "§cFailed to remove sanction"
 
-# Ban Messages
+# Ban Kick
 ban-permanent: "§cPermanent"
 ban-expired: "§aExpired"
 ban-kick-message: "§c§lYou have been banned!\n\n§fReason: §e{reason}\n§fTime remaining: §c{time}"
