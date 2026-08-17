@@ -6,9 +6,9 @@
 
 ## Features
 
-* **Staff Mode**: One command toggles staff mode - saves your position/inventory/gamemode, equips the tool kit, and glows you for other staff/ops.
+* **Staff Mode**: One command toggles staff mode - saves your position/inventory/gamemode, equips the tool kit, and marks you as staff for other staff/ops.
 * **Deduplicated Tool Kit**: Nine NBT-tagged tools, one hotbar, no overlap - RandomTp, Teleport, History, InvSee, EnderInv, Vanish, Freeze, Night Vision and Ban.
-* **Glow Tracking**: Staff members glow for other staff/ops via `SetActorDataPacket` metadata, without affecting anyone else's view of them.
+* **Staff Nametag**: Staff members get a colored, always-visible nametag while in staff mode. Bedrock Edition has no client-side glow/outline effect (that's Java Edition only), so this is the closest real equivalent.
 * **Kill/Death/Command History**: Per-player kill, death and command logs (with weapon/enchant details), persisted to SQLite and viewable through in-game forms.
 * **Block & Container Auditing**: Every block placement/break and container open/take/put is logged with world coordinates for later lookup.
 * **SQLite-backed Persistence**: A single indexed SQLite3 database with prepared statements and an in-memory query cache backs all history, replacing flat-file storage entirely.

@@ -230,10 +230,6 @@ final class ModeManager {
             if ($this->isVanished($other) && !$this->isStaffMember($player)) {
                 $player->hidePlayer($other);
             }
-
-            if ($this->isActive($other)) {
-                $this->glowManager->sendGlow($other, $player);
-            }
         }
     }
 

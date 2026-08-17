@@ -7,37 +7,49 @@ namespace Phoenix4041\Sentinel\manager;
 use pocketmine\player\Player;
 
 /**
- * Tracks which players are marked as staff-visible. This used to also push
- * a fake "glowing" SetActorDataPacket flag, but PMMP 5.x's
- * EntityMetadataFlags table has no glow/outline bit and there is no vanilla
- * status effect for it either - Bedrock's actual glow effect is driven by
- * scoreboard team color, which needs its own virion to do safely. Until
- * that's added, this only tracks who is in glow state; it has no visual
- * effect on the client.
+ * Marks staff members as easy to spot: a colored, always-visible nametag.
+ * Bedrock Edition has no client-side glow/outline effect at all (that's a
+ * Java Edition exclusive - there's no metadata flag, status effect or
+ * packet for it to send), so this is the closest verifiable equivalent the
+ * PMMP API actually supports.
  */
 final class GlowManager {
 
-    /** @var array<string, true> */
-    private array $glowing = [];
+    private const PREFIX = "§b§l";
+
+    /** @var array<string, string> original name tag, keyed by strtolower(name) */
+    private array $originalNameTags = [];
 
     public function __construct(private readonly PlayerRegistry $playerRegistry) {}
 
     public function addGlow(Player $player): void {
-        $this->glowing[strtolower($player->getName())] = true;
+        $key = strtolower($player->getName());
+        if (isset($this->originalNameTags[$key])) {
+            return;
+        }
+
+        $this->originalNameTags[$key] = $player->getNameTag();
+        $player->setNameTag(self::PREFIX . $player->getName());
+        $player->setNameTagAlwaysVisible(true);
     }
 
     public function removeGlow(Player $player): void {
-        unset($this->glowing[strtolower($player->getName())]);
+        $key = strtolower($player->getName());
+        if (!isset($this->originalNameTags[$key])) {
+            return;
+        }
+
+        $player->setNameTag($this->originalNameTags[$key]);
+        $player->setNameTagAlwaysVisible(false);
+        unset($this->originalNameTags[$key]);
     }
 
     public function removeAllGlow(): void {
-        foreach (array_keys($this->glowing) as $name) {
+        foreach (array_keys($this->originalNameTags) as $name) {
             $player = $this->playerRegistry->getByName($name);
             if ($player !== null) {
                 $this->removeGlow($player);
             }
         }
     }
-
-    public function sendGlow(Player $player, Player $viewer): void {}
 }

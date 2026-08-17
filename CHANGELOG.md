@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.1.1] - 2026-08-17
+
+### Fixed
+
+- `GlowManager` sent a `SetActorDataPacket` referencing `EntityMetadataFlags::GLOWING`, which does not exist in PMMP 5.x - it never would have compiled. Bedrock Edition has no client-side glow/outline effect at all (it's Java Edition exclusive; there is no metadata flag, status effect or packet for it), so `GlowManager` now marks staff with a colored, always-visible nametag (`Entity::setNameTag()` / `setNameTagAlwaysVisible()`) instead - the closest real equivalent the PMMP API supports.
+- `DatabaseManager` could call `exec()`/`prepare()` on a nullable `SQLite3` property without a null-check, and `prepare()`/`execute()` failures were never checked before use.
+- `SanctionManager` trusted `bans.yml`/`mutes.yml` contents without validating their shape after loading.
+- `ConfigManager` and `MessageManager` cast `Config::get()` values (`mixed`) straight to `float`/`int`/`string` without validating them first.
+- Form `handleResponse()` handlers cast client-submitted form data straight to `int`/`string` without validating it was actually numeric/scalar first.
+- Removed a dead `??` fallback on `ArmorInventory` getters, which never return `null` in this PMMP version.
+- Removed an unreachable `match` default arm in `SanctionManager::parseDuration()`.
+
+### Added
+
+- `composer.json` + `phpstan.neon` (pinned to the PMMP 5.x stubs) so the codebase can be linted at PHPStan level 9 (max) going forward.
+- `tools/build_phar.php` to package the plugin into a `.phar` the same way DevTools does, for local verification.
+- `.gitignore` for `vendor/`, `build/` and PHPStan's cache.
+
 ## [1.1.0] - 2026-08-17
 
 ### Changed
