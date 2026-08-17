@@ -32,9 +32,6 @@ final class GlowManager {
 
     public function removeAllGlow(): void {
         foreach (array_keys($this->glowing) as $name) {
-            // PM4->PM5 fix: previously used Server::getPlayerExact($name) here.
-            // Replaced with the shared PlayerRegistry lookup to avoid the
-            // forbidden getPlayerExact() pattern.
             $player = $this->playerRegistry->getByName($name);
             if ($player !== null) {
                 $this->removeGlow($player);
@@ -42,8 +39,5 @@ final class GlowManager {
         }
     }
 
-    public function sendGlow(Player $player, Player $viewer): void {
-        // No-op: kept as the call site other managers already use, in case
-        // a scoreboard-team-color glow implementation lands here later.
-    }
+    public function sendGlow(Player $player, Player $viewer): void {}
 }

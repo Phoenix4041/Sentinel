@@ -98,9 +98,6 @@ final class SanctionManager {
 
         $this->saveBans();
 
-        // PM4->PM5 fix: previously used $this->plugin->getServer()->getPlayerExact($playerName)
-        // here. Replaced with the shared PlayerRegistry lookup to avoid the
-        // forbidden getPlayerExact() pattern.
         $player = $this->playerRegistry->getByName($playerName);
         if ($player !== null) {
             $this->kickBannedPlayer($player);

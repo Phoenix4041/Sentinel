@@ -190,10 +190,6 @@ final class ModeManager {
         return isset($this->frozen[strtolower($player->getName())]);
     }
 
-    /**
-     * Whether the player should see vanish/glow through - staff stays
-     * visible to other staff (in or out of mode) and to ops.
-     */
     public function isStaffMember(Player $player): bool {
         return $player->hasPermission("sentinel.staff") || $player->hasPermission("pocketmine.command.op");
     }
