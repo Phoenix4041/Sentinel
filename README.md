@@ -2,6 +2,8 @@
 
 ### A unified staff toolkit for PocketMine-MP 5.x: one staff mode, one deduplicated tool kit, one SQLite-backed audit log.
 
+**Statically analyzed with [PHPStan](https://phpstan.org) at max level (9) - zero errors.**
+
 ---
 
 ## Features
@@ -111,6 +113,7 @@ src/Phoenix4041/Sentinel/
 * **Dependency Injection**: Managers receive their collaborators (e.g. `ModeManager` receives `GlowManager`, `PlayerRegistry`, `MessageManager`, `ConfigManager`) through constructors rather than reaching into globals.
 * **NBT-Tagged Items**: Tool identity is resolved via an NBT marker, not `CustomName` string matching, so it survives renames/localization.
 * **Type Safety**: `declare(strict_types=1)` and typed properties/return types throughout.
+* **Statically Verified**: `composer install && vendor/bin/phpstan analyse` runs clean at level 9 (max), pinned against the real PMMP 5.x API stubs - no `mixed`-cast guesses, no unchecked nullables.
 
 ---
 
